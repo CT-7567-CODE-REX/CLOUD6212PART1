@@ -14,6 +14,9 @@ builder.ConfigureFunctionsWebApplication();
 // Register the CoffeeNChill menu storage service.
 builder.Services.AddSingleton<MenuStorageService>();
 
+// Register the Azure File Share service.
+builder.Services.AddSingleton<StaffDocumentService>();
+
 // Enable Application Insights/OpenTelemetry only when configured.
 if (!string.IsNullOrEmpty(
     Environment.GetEnvironmentVariable(

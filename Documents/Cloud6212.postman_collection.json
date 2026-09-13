@@ -265,6 +265,193 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Upload staff document",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Staff document was uploaded\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "\r",
+              "    pm.expect(data.message)\r",
+              "        .to.eql(\"Staff document uploaded successfully.\");\r",
+              "\r",
+              "    pm.expect(data.fileName)\r",
+              "        .to.eql(\"Barista-Recipe.pdf\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "File",
+              "type": "file",
+              "uuid": "f444be9d-5e71-4999-a28d-977ab8585a4e",
+              "src": "/C:/Users/27724/Documents/ASSIGNMENT/Barista-Recipe.pdf"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:7046/api/documents/upload",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7046",
+          "path": [
+            "api",
+            "documents",
+            "upload"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Staff Documents",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Documents are returned as an array\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "\r",
+              "    pm.expect(data).to.be.an(\"array\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Barista recipe exists\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "\r",
+              "    const exists = data.some(function (document) {\r",
+              "        return document.fileName === \"Barista-Recipe.pdf\";\r",
+              "    });\r",
+              "\r",
+              "    pm.expect(exists).to.eql(true);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:7046/api/documents",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7046",
+          "path": [
+            "api",
+            "documents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Download Staff Document",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Downloaded file is not empty\", function () {\r",
+              "    pm.expect(pm.response.responseSize)\r",
+              "        .to.be.above(0);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:7046/api/documents/download/Barista-Recipe.pdf",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7046",
+          "path": [
+            "api",
+            "documents",
+            "download",
+            "Barista-Recipe.pdf"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Download Missing Document",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Missing document returns 404\", function () {\r",
+              "    pm.response.to.have.status(404);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:7046/api/documents/download/Does-Not-Exist.pdf",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7046",
+          "path": [
+            "api",
+            "documents",
+            "download",
+            "Does-Not-Exist.pdf"
+          ]
+        }
+      },
+      "response": []
     }
   ]
 }
