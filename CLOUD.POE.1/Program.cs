@@ -1,20 +1,29 @@
 using Azure.Monitor.OpenTelemetry.Exporter;
-using Microsoft.Azure.Functions.Worker;
+using CLOUD.POE._1.Services;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenTelemetry;
 
+// Create the Azure Functions application.
 var builder = FunctionsApplication.CreateBuilder(args);
 
+// Enable ASP.NET Core HTTP support.
 builder.ConfigureFunctionsWebApplication();
 
-if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING")))
+// Register the CoffeeNChill menu storage service.
+builder.Services.AddSingleton<MenuStorageService>();
+
+// Enable Application Insights/OpenTelemetry only when configured.
+if (!string.IsNullOrEmpty(
+    Environment.GetEnvironmentVariable(
+        "APPLICATIONINSIGHTS_CONNECTION_STRING")))
 {
-    builder.Services.AddOpenTelemetry()
+    builder.Services
+        .AddOpenTelemetry()
         .UseFunctionsWorkerDefaults()
         .UseAzureMonitorExporter();
 }
 
+// Build and start the Functions application once.
 builder.Build().Run();
