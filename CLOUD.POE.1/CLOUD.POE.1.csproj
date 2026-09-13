@@ -21,4 +21,10 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Menu\" />
+    <Folder Include="Documents\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>
