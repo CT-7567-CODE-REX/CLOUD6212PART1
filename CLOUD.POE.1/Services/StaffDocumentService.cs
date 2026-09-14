@@ -1,131 +1,95 @@
-﻿using Azure;
-using Azure.Storage.Files.Shares;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using CLOUD.POE._1.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 
 namespace CLOUD.POE._1.Services
 {
     public class StaffDocumentService
     {
-        private readonly ShareClient _shareClient;
+        private readonly BlobContainerClient _containerClient;
 
-        public StaffDocumentService(IConfiguration configuration)
+        public StaffDocumentService()
         {
-            // Read the real Azure Storage connection string.
             string connectionString =
-                configuration["StaffDocumentsConnection"]
-                ?? throw new InvalidOperationException(
-                    "StaffDocumentsConnection is not configured."
-                );
+                Environment.GetEnvironmentVariable("StaffDocumentsConnection")
+                ?? "UseDevelopmentStorage=true";
 
-            // Connect to the staff-docs Azure File Share.
-            _shareClient = new ShareClient(
+            _containerClient = new BlobContainerClient(
                 connectionString,
-                "staff-docs"
-            );
+                "staff-docs");
         }
 
-        private async Task EnsureShareExistsAsync()
+        private async Task EnsureContainerExistsAsync()
         {
-            // Create the share if it does not already exist.
-            await _shareClient.CreateIfNotExistsAsync();
+            await _containerClient.CreateIfNotExistsAsync(
+                PublicAccessType.None);
         }
 
         public async Task UploadAsync(IFormFile file)
         {
-            await EnsureShareExistsAsync();
+            await EnsureContainerExistsAsync();
 
-            // Use the root folder of staff-docs.
-            var directoryClient =
-                _shareClient.GetRootDirectoryClient();
+            string fileName = Path.GetFileName(file.FileName);
 
-            // Keep only the file name.
-            string safeFileName =
-                Path.GetFileName(file.FileName);
+            BlobClient blobClient =
+                _containerClient.GetBlobClient(fileName);
 
-            var fileClient =
-                directoryClient.GetFileClient(safeFileName);
+            // Replace an existing document with the same name.
+            await blobClient.DeleteIfExistsAsync();
 
-            // Replace a file if the same name already exists.
-            await fileClient.DeleteIfExistsAsync();
+            using Stream stream = file.OpenReadStream();
 
-            // Azure Files requires the file size before uploading data.
-            await fileClient.CreateAsync(file.Length);
+            BlobUploadOptions options = new BlobUploadOptions
+            {
+                HttpHeaders = new BlobHttpHeaders
+                {
+                    ContentType = string.IsNullOrWhiteSpace(file.ContentType)
+                        ? "application/octet-stream"
+                        : file.ContentType
+                }
+            };
 
-            await using Stream stream =
-                file.OpenReadStream();
-
-            // Upload the file from the beginning.
-            await fileClient.UploadRangeAsync(
-                new HttpRange(0, file.Length),
-                stream
-            );
+            await blobClient.UploadAsync(stream, options);
         }
 
         public async Task<List<StaffDocumentInfo>> ListAsync()
         {
-            await EnsureShareExistsAsync();
-
-            var directoryClient =
-                _shareClient.GetRootDirectoryClient();
+            await EnsureContainerExistsAsync();
 
             List<StaffDocumentInfo> documents = new();
 
-            // Read all files stored in staff-docs.
-            await foreach (
-                var item in
-                directoryClient.GetFilesAndDirectoriesAsync())
+            await foreach (BlobItem blob in _containerClient.GetBlobsAsync())
             {
-                if (item.IsDirectory)
+                documents.Add(new StaffDocumentInfo
                 {
-                    continue;
-                }
-
-                var fileClient =
-                    directoryClient.GetFileClient(item.Name);
-
-                var properties =
-                    await fileClient.GetPropertiesAsync();
-
-                documents.Add(
-                    new StaffDocumentInfo
-                    {
-                        FileName = item.Name,
-                        Size = properties.Value.ContentLength,
-                        LastModified =
-                            properties.Value.LastModified
-                    }
-                );
+                    FileName = blob.Name,
+                    Size = blob.Properties.ContentLength ?? 0,
+                    LastModified = blob.Properties.LastModified
+                });
             }
 
             return documents;
         }
 
-        public async Task<Stream?> DownloadAsync(
-            string fileName)
+        public async Task<Stream?> DownloadAsync(string fileName)
         {
-            await EnsureShareExistsAsync();
+            await EnsureContainerExistsAsync();
 
-            var directoryClient =
-                _shareClient.GetRootDirectoryClient();
+            string safeFileName = Path.GetFileName(fileName);
 
-            string safeFileName =
-                Path.GetFileName(fileName);
+            BlobClient blobClient =
+                _containerClient.GetBlobClient(safeFileName);
 
-            var fileClient =
-                directoryClient.GetFileClient(safeFileName);
-
-            // Return null when the requested document does not exist.
-            if (!await fileClient.ExistsAsync())
+            if (!await blobClient.ExistsAsync())
             {
                 return null;
             }
 
-            var download =
-                await fileClient.DownloadAsync();
+            BlobDownloadStreamingResult download =
+                await blobClient.DownloadStreamingAsync();
 
-            return download.Value.Content;
+            return download.Content;
         }
     }
 }

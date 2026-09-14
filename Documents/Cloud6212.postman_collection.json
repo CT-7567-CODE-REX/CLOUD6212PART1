@@ -71,12 +71,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:7046/api/menu",
+          "raw": "http://localhost:7071/api/menu",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "7046",
+          "port": "7071",
           "path": [
             "api",
             "menu"
@@ -125,12 +125,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:7046/api/menu",
+          "raw": "http://localhost:7071/api/menu",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "7046",
+          "port": "7071",
           "path": [
             "api",
             "menu"
@@ -160,12 +160,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:7046/api/menu/category/Hot%20Drinks",
+          "raw": "http://localhost:7071/api/menu/category/Hot%20Drinks",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "7046",
+          "port": "7071",
           "path": [
             "api",
             "menu",
@@ -213,12 +213,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:7046/api/menu/Hot%20Drinks/COF-002",
+          "raw": "http://localhost:7071/api/menu/Hot%20Drinks/COF-002",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "7046",
+          "port": "7071",
           "path": [
             "api",
             "menu",
@@ -250,12 +250,12 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:7046/api/menu/Hot%20Drinks/COF-001",
+          "raw": "http://localhost:7071/api/menu/Hot%20Drinks/COF-001",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "7046",
+          "port": "7071",
           "path": [
             "api",
             "menu",
@@ -308,12 +308,12 @@
           ]
         },
         "url": {
-          "raw": "http://localhost:7046/api/documents/upload",
+          "raw": "http://localhost:7071/api/documents/upload",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "7046",
+          "port": "7071",
           "path": [
             "api",
             "documents",
@@ -360,12 +360,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:7046/api/documents",
+          "raw": "http://localhost:7071/api/documents",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "7046",
+          "port": "7071",
           "path": [
             "api",
             "documents"
@@ -400,12 +400,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:7046/api/documents/download/Barista-Recipe.pdf",
+          "raw": "http://localhost:7071/api/documents/download/Barista-Recipe.pdf",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "7046",
+          "port": "7071",
           "path": [
             "api",
             "documents",
@@ -437,17 +437,131 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:7046/api/documents/download/Does-Not-Exist.pdf",
+          "raw": "http://localhost:7071/api/documents/download/Does-Not-Exist.pdf",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "7046",
+          "port": "7071",
           "path": [
             "api",
             "documents",
             "download",
             "Does-Not-Exist.pdf"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Iced Latte - Docker",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"category\": \"Cold Drinks\",\r\n  \"id\": \"COL-002\",\r\n  \"name\": \"Iced Latte\",\r\n  \"description\": \"Cold espresso with milk and ice\",\r\n  \"price\": 34.50,\r\n  \"isAvailable\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7071/api/menu",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7071",
+          "path": [
+            "api",
+            "menu"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Upload Assignment File",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": "/C:/Users/27724/Documents/ASSIGNMENT/CLOUD6212_Part1_Blob_Demonstration.pdf"
+          }
+        },
+        "url": {
+          "raw": "http://localhost:7071/api/Uploadassignmentfile?studentNumber=ST10358794&fileName=CLOUD6212_Part1_Blob_Demonstration.pdf",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7071",
+          "path": [
+            "api",
+            "Uploadassignmentfile"
+          ],
+          "query": [
+            {
+              "key": "studentNumber",
+              "value": "ST10358794"
+            },
+            {
+              "key": "fileName",
+              "value": "CLOUD6212_Part1_Blob_Demonstration.pdf"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "et Assignment File",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Downloaded assignment is not empty\", function () {\r",
+              "    pm.expect(pm.response.responseSize).to.be.above(0);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:7071/api/Getassignmentfile?studentNumber=ST10358794&fileName=CLOUD6212_Part1_Blob_Demonstration.pdf",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7071",
+          "path": [
+            "api",
+            "Getassignmentfile"
+          ],
+          "query": [
+            {
+              "key": "studentNumber",
+              "value": "ST10358794"
+            },
+            {
+              "key": "fileName",
+              "value": "CLOUD6212_Part1_Blob_Demonstration.pdf"
+            }
           ]
         }
       },
